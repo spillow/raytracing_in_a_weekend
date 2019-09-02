@@ -1,7 +1,7 @@
 use std::io::Write;
 use std::fs::File;
 
-use vec3::math::*;
+use rayutils::vec3::math::*;
 
 fn main() -> std::io::Result<()> {
     println!("Hello, world!");

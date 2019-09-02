@@ -5,8 +5,8 @@ authors = ["spillow <scott.pillow@gmail.com>"]
 edition = "2018"
 
 [lib]
-name = "vec3"
-path = "src/vec3.rs"
+name = "rayutils"
+path = "src/lib.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
