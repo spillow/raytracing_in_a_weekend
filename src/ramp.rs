@@ -1,7 +1,7 @@
 pub mod module {
 
 use crate::types::module::*;
-use crate::vec3::math::*;
+use crate::vec3::module::*;
 
 pub fn color_ramp_test() -> Image {
     let nx = 200;

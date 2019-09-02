@@ -1,4 +1,4 @@
-use rayutils::vec3::math::*;
+use rayutils::vec3::module::*;
 use rayutils::ramp::module as ramp;
 use rayutils::ppm::module as ppm;
 
