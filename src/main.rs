@@ -1,17 +1,35 @@
 use std::io::Write;
 use std::fs::File;
 
-fn mk_color(x: u8) -> Color {
-    (x,x,x)
-}
-
 fn main() -> std::io::Result<()> {
     println!("Hello, world!");
-    let row1 = vec![mk_color(1u8),mk_color(2u8),mk_color(3u8)];
-    let row2 = vec![mk_color(3u8),mk_color(4u8),mk_color(5u8)];
-    let img = vec![row1, row2];
-    write_ppm(&img, "my_output.txt")?;
+    let img = color_ramp_test();
+    write_ppm(&img, "my_output.ppm")?;
     Ok(())
+}
+
+fn color_ramp_test() -> Image {
+    let nx = 200;
+    let ny = 100;
+
+    let mut rows = Vec::new();
+
+    for j in (0..ny).rev() {
+        let mut cols = Vec::new();
+        for i in 0..nx {
+            let r = i as f32 / nx as f32;
+            let g = j as f32 / ny as f32;
+            let b = 0.2f32;
+
+            let ir = (255.99f32 * r) as u8;
+            let ig = (255.99f32 * g) as u8;
+            let ib = (255.99f32 * b) as u8;
+            cols.push((ir,ig,ib));
+        }
+        rows.push(cols);
+    }
+
+    rows
 }
 
 // img[row][col]
