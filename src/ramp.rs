@@ -31,9 +31,15 @@ pub fn color_ramp_test() -> Image {
 }
 
 fn color(r: &Ray) -> Color {
+    // make it so -1 < y < 1
     let unit_direction = Vec3::unit_vector(r.dir());
+    // shift and scale so 0 < t < 1
+    // so y = 1  => t = 1
+    //    y = -1 => t = 0
     let t = 0.5f32 * (unit_direction.y() + 1.);
-    (1.-t) * Vec3::new(1.,1.,1.) + t*Vec3::new(0.5,0.7,1.0)
+    let blue  = Color::new(0.5, 0.7, 1.0);
+    let white = Color::new(1.,1.,1.);
+    (1.-t)*white + t*blue
 }
 
 pub fn color_ray_test() -> Image {
