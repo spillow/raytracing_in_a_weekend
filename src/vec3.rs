@@ -15,32 +15,32 @@ impl Vec3 {
 
     // access individual elements
     // This struct is shared by colors and vectors
-    fn x(&self) -> f32 { self.e[0] }
-    fn y(&self) -> f32 { self.e[1] }
-    fn z(&self) -> f32 { self.e[2] }
+    pub fn x(&self) -> f32 { self.e[0] }
+    pub fn y(&self) -> f32 { self.e[1] }
+    pub fn z(&self) -> f32 { self.e[2] }
     pub fn r(&self) -> f32 { self.e[0] }
     pub fn g(&self) -> f32 { self.e[1] }
     pub fn b(&self) -> f32 { self.e[2] }
 
-    fn length(&self) -> f32 {
+    pub fn length(&self) -> f32 {
         self.squared_length().sqrt()
     }
-    fn squared_length(&self) -> f32 {
+    pub fn squared_length(&self) -> f32 {
         self.e[0]*self.e[0] + self.e[1]*self.e[1] + self.e[2]*self.e[2]
     }
-    fn make_unit_vector(&mut self) {
+    pub fn make_unit_vector(&mut self) {
         let k = self.length();
         self.e[0] /= k;
         self.e[1] /= k;
         self.e[2] /= k;
     }
-    fn unit_vector(v: Vec3) -> Vec3 {
+    pub fn unit_vector(v: Vec3) -> Vec3 {
         v / v.length()
     }
-    fn dot(v1: &Vec3, v2: &Vec3) -> f32 {
+    pub fn dot(v1: &Vec3, v2: &Vec3) -> f32 {
         v1.e[0]*v2.e[0] + v1.e[1]*v2.e[1] + v1.e[2]*v2.e[2]
     }
-    fn cross(v1: &Vec3, v2: &Vec3) -> Vec3 {
+    pub fn cross(v1: &Vec3, v2: &Vec3) -> Vec3 {
         Vec3 {
             e:
             [v1.e[1]*v2.e[2] - v1.e[2]*v2.e[1],
@@ -103,6 +103,28 @@ impl ops::Mul for Vec3 {
             [self.e[0] * rhs.e[0],
              self.e[1] * rhs.e[1],
              self.e[2] * rhs.e[2]]
+        }
+    }
+}
+
+impl ops::Mul<f32> for Vec3 {
+    type Output = Vec3;
+    fn mul(self, rhs: f32) -> Vec3 {
+        Vec3 { e:
+            [self.e[0] * rhs,
+             self.e[1] * rhs,
+             self.e[2] * rhs]
+        }
+    }
+}
+
+impl ops::Mul<Vec3> for f32 {
+    type Output = Vec3;
+    fn mul(self, rhs: Vec3) -> Vec3 {
+        Vec3 { e:
+            [self * rhs.e[0],
+             self * rhs.e[1],
+             self * rhs.e[2]]
         }
     }
 }
