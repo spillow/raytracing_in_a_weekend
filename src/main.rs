@@ -6,8 +6,15 @@ fn chap1_output(path: &str) -> std::io::Result<()> {
     ppm::write_ppm(&img, path)?;
     Ok(())
 }
+
 fn chap3_output(path: &str) -> std::io::Result<()> {
     let img = ramp::color_ray_test();
+    ppm::write_ppm(&img, path)?;
+    Ok(())
+}
+
+fn chap4_output(path: &str) -> std::io::Result<()> {
+    let img = ramp::sphere_hit_ray_test();
     ppm::write_ppm(&img, path)?;
     Ok(())
 }
@@ -15,6 +22,8 @@ fn chap3_output(path: &str) -> std::io::Result<()> {
 fn main() -> std::io::Result<()> {
     chap1_output("chap1.ppm")?;
     chap3_output("chap3.ppm")?;
+    chap4_output("chap4.ppm")?;
 
+    println!("Finished tracing!");
     Ok(())
 }
