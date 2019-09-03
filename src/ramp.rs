@@ -3,8 +3,8 @@ pub mod module {
 use crate::types::module::*;
 use crate::vec3::module::*;
 use crate::ray::module::*;
-use crate::intersection::module as intersect;
-use crate::objects::module::*;
+use crate::hittable::module::*;
+use std::f32;
 
 // chap1
 pub fn color_ramp_test() -> Image {
@@ -79,15 +79,13 @@ pub fn color_ray_test() -> Image {
     rows
 }
 
-fn color_sphere(r: &Ray) -> Color {
-    let sphere = Sphere::new(Vec3::new(0.,0.,-1.), 0.5);
-    if let Some(t) = intersect::hit_sphere(&sphere, r) {
-        if t > 0. {
-            let n = Vec3::unit_vector(r.point_at_parameter(t) - sphere.center());
-            // visualize the normals
-            return 0.5*Color::new(n.x()+1.,n.y()+1.,n.z()+1.);
-        }
+fn color_world(r: &Ray, world: &dyn Hittable) -> Color {
+    let mut record = HitRecord::new();
+    if world.hit(r, 0., f32::MAX, &mut record) {
+        let n = record.normal;
+        return 0.5*Color::new(n.x()+1.,n.y()+1.,n.z()+1.);
     }
+
     // make it so -1 < y < 1
     let unit_direction = Vec3::unit_vector(r.dir());
     // shift and scale so 0 < t < 1
@@ -111,6 +109,13 @@ pub fn sphere_hit_ray_test() -> Image {
     let vertical   = Vec3::new(0., 2., 0.);
     let origin     = Point::new(0., 0., 0.);
 
+    let sphere1 = Sphere::new(Point::new(0.,0.,-1.), 0.5);
+    let sphere2 = Sphere::new(Point::new(0.,-100.5,-1.), 100.);
+
+    let spheres:Vec<&dyn Hittable> = vec![&sphere1, &sphere2];
+
+    let world = HittableList::new(spheres);
+
     for j in (0..ny).rev() {
         let mut cols = Vec::new();
         for i in 0..nx {
@@ -119,7 +124,7 @@ pub fn sphere_hit_ray_test() -> Image {
 
             let r = Ray::new(origin, lower_left_corner + u*horizontal + v*vertical);
 
-            let mut color = color_sphere(&r);
+            let mut color = color_world(&r, &world);
             color *= 255.99f32;
 
             let ir = color.r() as u8;
