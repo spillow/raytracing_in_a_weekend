@@ -82,11 +82,26 @@ pub fn color_ray_test() -> Image {
     rows
 }
 
+fn rand_unit() -> f32 {
+    rand::thread_rng().gen_range(0.0f32, 1.0f32)
+}
+
+fn random_in_unit_sphere() -> Vec3 {
+    let mut p:Point;
+    loop {
+        p = 2.0 * Vec3::new(rand_unit(), rand_unit(), rand_unit()) - Vec3::new(1.,1.,1.);
+        if p.squared_length() < 1.0 {
+            break;
+        }
+    }
+    p
+}
+
 fn color_world(r: &Ray, world: &dyn Hittable) -> Color {
     let mut record = HitRecord::new();
     if world.hit(r, 0., f32::MAX, &mut record) {
-        let n = record.normal;
-        return 0.5*Color::new(n.x()+1.,n.y()+1.,n.z()+1.);
+        let target = record.p + record.normal + random_in_unit_sphere();
+        return 0.5*color_world(&Ray::new(record.p, target - record.p), world);
     }
 
     // make it so -1 < y < 1
@@ -100,7 +115,7 @@ fn color_world(r: &Ray, world: &dyn Hittable) -> Color {
     (1.-t)*white + t*blue
 }
 
-// chap6
+// chap7
 pub fn sphere_hit_ray_test() -> Image {
     let nx = 200;
     let ny = 100;
@@ -116,17 +131,13 @@ pub fn sphere_hit_ray_test() -> Image {
     let world = HittableList::new(spheres);
     let cam = Camera::new();
 
-    let mut rng = rand::thread_rng();
-
     for j in (0..ny).rev() {
         let mut cols = Vec::new();
         for i in 0..nx {
             let mut color = Color::init();
             for _ in 0..ns {
-                let rand_i = rng.gen_range(0.0f32, 1.0f32);
-                let rand_j = rng.gen_range(0.0f32, 1.0f32);
-                let u = ((i as f32) + rand_i) / nx as f32;
-                let v = ((j as f32) + rand_j) / ny as f32;
+                let u = ((i as f32) + rand_unit()) / nx as f32;
+                let v = ((j as f32) + rand_unit()) / ny as f32;
                 let r = cam.get_ray(u, v);
                 color += color_world(&r, &world);
             }
