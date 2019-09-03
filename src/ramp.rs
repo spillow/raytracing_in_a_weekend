@@ -52,8 +52,8 @@ pub fn raytrace() -> Image {
 
     let red_diffuse    = Lambertian::new(Color::new(0.8, 0.3, 0.3), 0);
     let yellow_diffuse = Lambertian::new(Color::new(0.8, 0.8, 0.0), 1);
-    let metal1         = Metal::new(Color::new(0.8, 0.6, 0.2), 2);
-    let metal2         = Metal::new(Color::new(0.8, 0.8, 0.8), 3);
+    let metal1         = Metal::new(Color::new(0.8, 0.6, 0.2), 1., 2);
+    let metal2         = Metal::new(Color::new(0.8, 0.8, 0.8), 0.3, 3);
 
     let materials:Vec<&dyn Material> = vec![&red_diffuse, &yellow_diffuse, &metal1, &metal2];
 

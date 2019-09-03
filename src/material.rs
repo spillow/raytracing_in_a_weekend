@@ -27,6 +27,7 @@ pub struct Lambertian {
 #[derive(Copy, Clone)]
 pub struct Metal {
     albedo: Vec3,
+    fuzz: f32,
     idx: u32 // index in material table
 }
 
@@ -37,8 +38,9 @@ impl Lambertian {
 }
 
 impl Metal {
-    pub fn new(albedo: Vec3, idx: u32) -> Metal {
-        Metal { albedo, idx }
+    pub fn new(albedo: Vec3, fuzz:f32, idx: u32) -> Metal {
+        let clamped_fuzz = if fuzz < 1. { fuzz } else { 1. };
+        Metal { albedo, fuzz:clamped_fuzz, idx }
     }
 }
 
@@ -90,7 +92,7 @@ impl Material for Metal {
         scattered: &mut Ray) -> bool {
 
         let reflected = reflect(Vec3::unit_vector(r_in.dir()), record.normal);
-        *scattered = Ray::new(record.p, reflected);
+        *scattered = Ray::new(record.p, reflected + self.fuzz * random_in_unit_sphere());
         *attenuation = self.albedo;
 
         Vec3::dot(&scattered.dir(), &record.normal) > 0.
