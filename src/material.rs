@@ -14,15 +14,19 @@ pub trait Material {
         record: &HitRecord,
         attenuation: &mut Vec3,
         scattered: &mut Ray) -> bool;
+
+    fn getIdx(&self) -> u32;
 }
 
+#[derive(Copy, Clone)]
 pub struct Lambertian {
-    albedo: Vec3
+    albedo: Vec3,
+    idx: u32 // index in material table
 }
 
 impl Lambertian {
-    pub fn new(albedo: Vec3) -> Lambertian {
-        Lambertian { albedo: albedo }
+    pub fn new(albedo: Vec3, idx: u32) -> Lambertian {
+        Lambertian { albedo, idx }
     }
 }
 
@@ -54,6 +58,10 @@ impl Material for Lambertian {
         *attenuation = self.albedo;
 
         true
+    }
+
+    fn getIdx(&self) -> u32 {
+        self.idx
     }
 }
 
