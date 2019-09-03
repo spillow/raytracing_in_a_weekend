@@ -56,8 +56,9 @@ impl Hittable for Sphere<'_> {
             if curr_t < t_max && curr_t > t_min { // check in range
                 record.t = curr_t;
                 record.p = r.point_at_parameter(curr_t);
+                // this is normalized
                 record.normal = (record.p - s.center()) / s.radius();
-                record.mat = Some(self.material.getIdx());
+                record.mat = Some(self.material.get_idx());
                 return true;
             }
             // check the other root
@@ -65,8 +66,9 @@ impl Hittable for Sphere<'_> {
             if curr_t < t_max && curr_t > t_min { // check in range
                 record.t = curr_t;
                 record.p = r.point_at_parameter(curr_t);
+                // this is normalized
                 record.normal = (record.p - s.center()) / s.radius();
-                record.mat = Some(self.material.getIdx());
+                record.mat = Some(self.material.get_idx());
                 return true;
             }
         }

@@ -51,14 +51,18 @@ pub fn raytrace() -> Image {
     let mut rows = Vec::new();
 
     let red_diffuse    = Lambertian::new(Color::new(0.8, 0.3, 0.3), 0);
-    let yellow_diffuse = Lambertian::new(Color::new(0.8, 0.3, 0.3), 1);
+    let yellow_diffuse = Lambertian::new(Color::new(0.8, 0.8, 0.0), 1);
+    let metal1         = Metal::new(Color::new(0.8, 0.6, 0.2), 2);
+    let metal2         = Metal::new(Color::new(0.8, 0.8, 0.8), 3);
 
-    let materials:Vec<&dyn Material> = vec![&red_diffuse, &yellow_diffuse];
+    let materials:Vec<&dyn Material> = vec![&red_diffuse, &yellow_diffuse, &metal1, &metal2];
 
     let sphere1 = Sphere::new(Point::new(0.,0.,-1.), 0.5, &red_diffuse);
     let sphere2 = Sphere::new(Point::new(0.,-100.5,-1.), 100., &yellow_diffuse);
+    let sphere3 = Sphere::new(Point::new(1.,0.,-1.), 0.5, &metal1);
+    let sphere4 = Sphere::new(Point::new(-1.,0.,-1.), 0.5, &metal2);
 
-    let spheres:Vec<&dyn Hittable> = vec![&sphere1, &sphere2];
+    let spheres:Vec<&dyn Hittable> = vec![&sphere1, &sphere2, &sphere3, &sphere4];
 
     let world = HittableList::new(spheres);
     let cam = Camera::new();

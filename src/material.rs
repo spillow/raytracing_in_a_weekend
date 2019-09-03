@@ -15,7 +15,7 @@ pub trait Material {
         attenuation: &mut Vec3,
         scattered: &mut Ray) -> bool;
 
-    fn getIdx(&self) -> u32;
+    fn get_idx(&self) -> u32;
 }
 
 #[derive(Copy, Clone)]
@@ -24,9 +24,21 @@ pub struct Lambertian {
     idx: u32 // index in material table
 }
 
+#[derive(Copy, Clone)]
+pub struct Metal {
+    albedo: Vec3,
+    idx: u32 // index in material table
+}
+
 impl Lambertian {
     pub fn new(albedo: Vec3, idx: u32) -> Lambertian {
         Lambertian { albedo, idx }
+    }
+}
+
+impl Metal {
+    pub fn new(albedo: Vec3, idx: u32) -> Metal {
+        Metal { albedo, idx }
     }
 }
 
@@ -60,7 +72,31 @@ impl Material for Lambertian {
         true
     }
 
-    fn getIdx(&self) -> u32 {
+    fn get_idx(&self) -> u32 {
+        self.idx
+    }
+}
+
+fn reflect(v: Vec3, n: Vec3) -> Vec3 {
+    v - 2. * Vec3::dot(&v, &n) * n
+}
+
+impl Material for Metal {
+    fn scatter(
+        &self,
+        r_in: &Ray,
+        record: &HitRecord,
+        attenuation: &mut Vec3,
+        scattered: &mut Ray) -> bool {
+
+        let reflected = reflect(Vec3::unit_vector(r_in.dir()), record.normal);
+        *scattered = Ray::new(record.p, reflected);
+        *attenuation = self.albedo;
+
+        Vec3::dot(&scattered.dir(), &record.normal) > 0.
+    }
+
+    fn get_idx(&self) -> u32 {
         self.idx
     }
 }
