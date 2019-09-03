@@ -81,8 +81,12 @@ pub fn color_ray_test() -> Image {
 
 fn color_sphere(r: &Ray) -> Color {
     let sphere = Sphere::new(Vec3::new(0.,0.,-1.), 0.5);
-    if intersect::hit_sphere(&sphere, r) {
-        return Color::new(1., 0., 0.); // draw a red sphere (no shading)
+    if let Some(t) = intersect::hit_sphere(&sphere, r) {
+        if t > 0. {
+            let n = Vec3::unit_vector(r.point_at_parameter(t) - sphere.center());
+            // visualize the normals
+            return 0.5*Color::new(n.x()+1.,n.y()+1.,n.z()+1.);
+        }
     }
     // make it so -1 < y < 1
     let unit_direction = Vec3::unit_vector(r.dir());
@@ -90,7 +94,7 @@ fn color_sphere(r: &Ray) -> Color {
     // so y = 1  => t = 1
     //    y = -1 => t = 0
     let t = 0.5f32 * (unit_direction.y() + 1.);
-    let blue  = Color::new(0.5, 0.7, 1.0);
+    let blue  = Color::new(0.5, 0.7, 1.0); // a light blue
     let white = Color::new(1.,1.,1.);
     (1.-t)*white + t*blue
 }
