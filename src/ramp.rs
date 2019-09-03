@@ -4,7 +4,10 @@ use crate::types::module::*;
 use crate::vec3::module::*;
 use crate::ray::module::*;
 use crate::hittable::module::*;
+use crate::camera::module::*;
 use std::f32;
+
+use rand::Rng;
 
 // chap1
 pub fn color_ramp_test() -> Image {
@@ -97,17 +100,13 @@ fn color_world(r: &Ray, world: &dyn Hittable) -> Color {
     (1.-t)*white + t*blue
 }
 
-// chap4
+// chap6
 pub fn sphere_hit_ray_test() -> Image {
     let nx = 200;
     let ny = 100;
+    let ns = 100; // num samples / pixel
 
     let mut rows = Vec::new();
-
-    let lower_left_corner = Point::new(-2., -1., -1.);
-    let horizontal = Vec3::new(4., 0., 0.);
-    let vertical   = Vec3::new(0., 2., 0.);
-    let origin     = Point::new(0., 0., 0.);
 
     let sphere1 = Sphere::new(Point::new(0.,0.,-1.), 0.5);
     let sphere2 = Sphere::new(Point::new(0.,-100.5,-1.), 100.);
@@ -115,18 +114,26 @@ pub fn sphere_hit_ray_test() -> Image {
     let spheres:Vec<&dyn Hittable> = vec![&sphere1, &sphere2];
 
     let world = HittableList::new(spheres);
+    let cam = Camera::new();
+
+    let mut rng = rand::thread_rng();
 
     for j in (0..ny).rev() {
         let mut cols = Vec::new();
         for i in 0..nx {
-            let u = i as f32 / nx as f32;
-            let v = j as f32 / ny as f32;
+            let mut color = Color::init();
+            for _ in 0..ns {
+                let rand_i = rng.gen_range(0.0f32, 1.0f32);
+                let rand_j = rng.gen_range(0.0f32, 1.0f32);
+                let u = ((i as f32) + rand_i) / nx as f32;
+                let v = ((j as f32) + rand_j) / ny as f32;
+                let r = cam.get_ray(u, v);
+                color += color_world(&r, &world);
+            }
 
-            let r = Ray::new(origin, lower_left_corner + u*horizontal + v*vertical);
+            color /= ns as f32;
 
-            let mut color = color_world(&r, &world);
             color *= 255.99f32;
-
             let ir = color.r() as u8;
             let ig = color.g() as u8;
             let ib = color.b() as u8;

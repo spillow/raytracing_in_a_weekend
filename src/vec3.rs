@@ -13,6 +13,11 @@ impl Vec3 {
         Vec3 { e: vals }
     }
 
+    pub fn init() -> Vec3 {
+        let vals = [0., 0., 0.];
+        Vec3 { e: vals }
+    }
+
     // access individual elements
     // This struct is shared by colors and vectors
     pub fn x(&self) -> f32 { self.e[0] }

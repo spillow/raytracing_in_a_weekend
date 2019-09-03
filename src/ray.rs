@@ -5,7 +5,7 @@ use crate::vec3::module::*;
 use crate::types::module::*;
 
 pub struct Ray {
-    orig: Vec3,
+    orig: Point,
     dir: Vec3
 }
 
