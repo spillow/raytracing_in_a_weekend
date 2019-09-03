@@ -99,7 +99,8 @@ fn random_in_unit_sphere() -> Vec3 {
 
 fn color_world(r: &Ray, world: &dyn Hittable) -> Color {
     let mut record = HitRecord::new();
-    if world.hit(r, 0., f32::MAX, &mut record) {
+    // use a small t_min value here to avoid "shadow acne"
+    if world.hit(r, 0.001, f32::MAX, &mut record) {
         let target = record.p + record.normal + random_in_unit_sphere();
         return 0.5*color_world(&Ray::new(record.p, target - record.p), world);
     }
@@ -143,6 +144,8 @@ pub fn sphere_hit_ray_test() -> Image {
             }
 
             color /= ns as f32;
+            // gamma 2 correction
+            color = Color::new(color.r().sqrt(), color.g().sqrt(), color.b().sqrt());
 
             color *= 255.99f32;
             let ir = color.r() as u8;
