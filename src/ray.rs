@@ -4,6 +4,7 @@ pub mod module {
 use crate::vec3::module::*;
 use crate::types::module::*;
 
+#[derive(Default)]
 pub struct Ray {
     orig: Point,
     dir: Vec3

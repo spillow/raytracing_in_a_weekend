@@ -5,6 +5,8 @@ use crate::vec3::module::*;
 use crate::ray::module::*;
 use crate::hittable::module::*;
 use crate::camera::module::*;
+use crate::material::module::*;
+
 use std::f32;
 
 use rand::Rng;
@@ -86,23 +88,18 @@ fn rand_unit() -> f32 {
     rand::thread_rng().gen_range(0.0f32, 1.0f32)
 }
 
-fn random_in_unit_sphere() -> Vec3 {
-    let mut p:Point;
-    loop {
-        p = 2.0 * Vec3::new(rand_unit(), rand_unit(), rand_unit()) - Vec3::new(1.,1.,1.);
-        if p.squared_length() < 1.0 {
-            break;
-        }
-    }
-    p
-}
-
-fn color_world(r: &Ray, world: &dyn Hittable) -> Color {
-    let mut record = HitRecord::new();
+fn color_world(r: &Ray, world: &dyn Hittable, depth: u32) -> Color {
+    let mut record = HitRecord::default();
     // use a small t_min value here to avoid "shadow acne"
     if world.hit(r, 0.001, f32::MAX, &mut record) {
-        let target = record.p + record.normal + random_in_unit_sphere();
-        return 0.5*color_world(&Ray::new(record.p, target - record.p), world);
+        let mut scattered   = Ray::default();
+        let mut attenuation = Vec3::default();
+        if depth < 50 &&
+           record.mat.unwrap().scatter(r, &record, &mut attenuation, &mut scattered) {
+            return attenuation * color_world(&scattered, world, depth + 1);
+        }
+        let black = Color::new(0.,0.,0.);
+        return black;
     }
 
     // make it so -1 < y < 1
@@ -116,7 +113,7 @@ fn color_world(r: &Ray, world: &dyn Hittable) -> Color {
     (1.-t)*white + t*blue
 }
 
-// chap7
+// chap8
 pub fn sphere_hit_ray_test() -> Image {
     let nx = 200;
     let ny = 100;
@@ -124,8 +121,11 @@ pub fn sphere_hit_ray_test() -> Image {
 
     let mut rows = Vec::new();
 
-    let sphere1 = Sphere::new(Point::new(0.,0.,-1.), 0.5);
-    let sphere2 = Sphere::new(Point::new(0.,-100.5,-1.), 100.);
+    let red_diffuse    = Lambertian::new(Color::new(0.8, 0.3, 0.3));
+    let yellow_diffuse = Lambertian::new(Color::new(0.8, 0.3, 0.3));
+
+    let sphere1 = Sphere::new(Point::new(0.,0.,-1.), 0.5, &red_diffuse);
+    let sphere2 = Sphere::new(Point::new(0.,-100.5,-1.), 100., &yellow_diffuse);
 
     let spheres:Vec<&dyn Hittable> = vec![&sphere1, &sphere2];
 
@@ -140,7 +140,7 @@ pub fn sphere_hit_ray_test() -> Image {
                 let u = ((i as f32) + rand_unit()) / nx as f32;
                 let v = ((j as f32) + rand_unit()) / ny as f32;
                 let r = cam.get_ray(u, v);
-                color += color_world(&r, &world);
+                color += color_world(&r, &world, 0);
             }
 
             color /= ns as f32;

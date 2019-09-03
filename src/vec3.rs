@@ -2,7 +2,7 @@ pub mod module {
 
 use std::ops;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Default)]
 pub struct Vec3 {
     e: [f32; 3]
 }

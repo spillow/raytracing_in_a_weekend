@@ -3,32 +3,29 @@ pub mod module {
 use crate::types::module::*;
 use crate::vec3::module::*;
 use crate::ray::module::*;
+use crate::material::module::*;
 
-#[derive(Clone, Copy)]
-pub struct HitRecord {
-    pub t: f32,      // t parameter
-    pub p: Point,    // hit location
-    pub normal: Vec3 // surface normal
-}
-
-impl HitRecord {
-    pub fn new() -> HitRecord {
-        HitRecord { t:0., p:Point::new(0.,0.,0.), normal:Vec3::new(0.,0.,0.) }
-    }
+#[derive(Clone, Copy, Default)]
+pub struct HitRecord<'a> {
+    pub t: f32,       // t parameter
+    pub p: Point,     // hit location
+    pub normal: Vec3, // surface normal
+    pub mat: Option<&'a dyn Material>
 }
 
 pub trait Hittable {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32, record: &mut HitRecord) -> bool;
 }
 
-pub struct Sphere {
+pub struct Sphere<'a> {
     center: Point,
-    radius: f32
+    radius: f32,
+    material: &'a dyn Material
 }
 
-impl Sphere {
-    pub fn new(center: Point, radius: f32) -> Sphere {
-        Sphere { center: center, radius: radius }
+impl<'a> Sphere<'a> {
+    pub fn new(center: Point, radius: f32, material: &dyn Material) -> Sphere {
+        Sphere { center: center, radius: radius, material: material}
     }
 
     pub fn center(&self) -> Point {
@@ -38,9 +35,13 @@ impl Sphere {
     pub fn radius(&self) -> f32 {
         self.radius
     }
+
+    pub fn material(&self) -> &dyn Material {
+        self.material
+    }
 }
 
-impl Hittable for Sphere {
+impl Hittable for Sphere<'_> {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32, record: &mut HitRecord) -> bool {
         let s = self;
         let oc = r.origin() - s.center();
@@ -56,6 +57,7 @@ impl Hittable for Sphere {
                 record.t = curr_t;
                 record.p = r.point_at_parameter(curr_t);
                 record.normal = (record.p - s.center()) / s.radius();
+                record.mat = Some(self.material);
                 return true;
             }
             // check the other root
@@ -64,6 +66,7 @@ impl Hittable for Sphere {
                 record.t = curr_t;
                 record.p = r.point_at_parameter(curr_t);
                 record.normal = (record.p - s.center()) / s.radius();
+                record.mat = Some(self.material);
                 return true;
             }
         }
@@ -85,7 +88,7 @@ impl HittableList<'_> {
 
 impl Hittable for HittableList<'_> {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32, record: &mut HitRecord) -> bool {
-        let mut tmp_record = HitRecord::new();
+        let mut tmp_record = HitRecord::default();
         let mut hit_anything = false;
         let mut closest_so_far = t_max;
         for obj in self.list.iter() {
