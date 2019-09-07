@@ -62,6 +62,8 @@ pub fn raytrace() -> Image {
     let sphere2 = Sphere::new(Point::new(0.,-100.5,-1.), 100., &yellow_diffuse);
     let sphere3 = Sphere::new(Point::new(1.,0.,-1.),     0.5,  &metal1);
     let sphere4 = Sphere::new(Point::new(-1.,0.,-1.),    0.5,  &dielectric);
+    // place a smaller sphere inside with negative radius to point normals
+    // inward.
     let sphere5 = Sphere::new(Point::new(-1.,0.,-1.),    -0.45,  &dielectric);
 
     let spheres:Vec<&dyn Hittable> = vec![&sphere1, &sphere2, &sphere3, &sphere4, &sphere5];
