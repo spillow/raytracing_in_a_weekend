@@ -3,7 +3,6 @@ pub mod module {
 use crate::types::module::*;
 use crate::vec3::module::*;
 use crate::ray::module::*;
-use crate::material::module::*;
 
 #[derive(Clone, Copy, Default)]
 pub struct HitRecord {
@@ -17,15 +16,15 @@ pub trait Hittable {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32, record: &mut HitRecord) -> bool;
 }
 
-pub struct Sphere<'a> {
+pub struct Sphere {
     center: Point,
     radius: f32,
-    material: &'a dyn Material
+    material: u32
 }
 
-impl Sphere<'_> {
-    pub fn new(center: Point, radius: f32, material: &dyn Material) -> Sphere {
-        Sphere { center: center, radius: radius, material: material}
+impl Sphere {
+    pub fn new(center: Point, radius: f32, material: u32) -> Sphere {
+        Sphere { center, radius, material}
     }
 
     pub fn center(&self) -> Point {
@@ -35,13 +34,9 @@ impl Sphere<'_> {
     pub fn radius(&self) -> f32 {
         self.radius
     }
-
-    pub fn material(&self) -> &dyn Material {
-        self.material
-    }
 }
 
-impl Hittable for Sphere<'_> {
+impl Hittable for Sphere {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32, record: &mut HitRecord) -> bool {
         let s = self;
         let oc = r.origin() - s.center();
@@ -58,7 +53,7 @@ impl Hittable for Sphere<'_> {
                 record.p = r.point_at_parameter(curr_t);
                 // this is normalized
                 record.normal = (record.p - s.center()) / s.radius();
-                record.mat = Some(self.material.get_idx());
+                record.mat = Some(self.material);
                 return true;
             }
             // check the other root
@@ -68,7 +63,7 @@ impl Hittable for Sphere<'_> {
                 record.p = r.point_at_parameter(curr_t);
                 // this is normalized
                 record.normal = (record.p - s.center()) / s.radius();
-                record.mat = Some(self.material.get_idx());
+                record.mat = Some(self.material);
                 return true;
             }
         }
@@ -78,17 +73,17 @@ impl Hittable for Sphere<'_> {
 }
 
 // a list of hittable objects
-pub struct HittableList<'a> {
-    list: Vec<&'a dyn Hittable>
+pub struct HittableList {
+    list: Vec<Box<dyn Hittable>>
 }
 
-impl HittableList<'_> {
-    pub fn new<'a>(v: Vec<&'a dyn Hittable>) -> HittableList<'a> {
+impl HittableList {
+    pub fn new(v: Vec<Box<dyn Hittable>>) -> HittableList {
         HittableList { list:v }
     }
 }
 
-impl Hittable for HittableList<'_> {
+impl Hittable for HittableList {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32, record: &mut HitRecord) -> bool {
         let mut tmp_record = HitRecord::default();
         let mut hit_anything = false;
