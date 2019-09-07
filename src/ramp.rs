@@ -50,19 +50,21 @@ pub fn raytrace() -> Image {
 
     let mut rows = Vec::new();
 
-    let red_diffuse    = Lambertian::new(Color::new(0.8, 0.3, 0.3), 0);
+    let red_diffuse    = Lambertian::new(Color::new(0.1, 0.2, 0.5), 0);
     let yellow_diffuse = Lambertian::new(Color::new(0.8, 0.8, 0.0), 1);
-    let metal1         = Metal::new(Color::new(0.8, 0.6, 0.2), 1., 2);
-    let metal2         = Metal::new(Color::new(0.8, 0.8, 0.8), 0.3, 3);
+    let metal1         = Metal::new(Color::new(0.8, 0.6, 0.2), 0.2, 2);
+    let dielectric     = Dielectric::new(1.5, 3);
 
-    let materials:Vec<&dyn Material> = vec![&red_diffuse, &yellow_diffuse, &metal1, &metal2];
+    let materials:Vec<&dyn Material> =
+        vec![&red_diffuse, &yellow_diffuse, &metal1, &dielectric];
 
-    let sphere1 = Sphere::new(Point::new(0.,0.,-1.), 0.5, &red_diffuse);
+    let sphere1 = Sphere::new(Point::new(0.,0.,-1.),     0.5,  &red_diffuse);
     let sphere2 = Sphere::new(Point::new(0.,-100.5,-1.), 100., &yellow_diffuse);
-    let sphere3 = Sphere::new(Point::new(1.,0.,-1.), 0.5, &metal1);
-    let sphere4 = Sphere::new(Point::new(-1.,0.,-1.), 0.5, &metal2);
+    let sphere3 = Sphere::new(Point::new(1.,0.,-1.),     0.5,  &metal1);
+    let sphere4 = Sphere::new(Point::new(-1.,0.,-1.),    0.5,  &dielectric);
+    let sphere5 = Sphere::new(Point::new(-1.,0.,-1.),    -0.45,  &dielectric);
 
-    let spheres:Vec<&dyn Hittable> = vec![&sphere1, &sphere2, &sphere3, &sphere4];
+    let spheres:Vec<&dyn Hittable> = vec![&sphere1, &sphere2, &sphere3, &sphere4, &sphere5];
 
     let world = HittableList::new(spheres);
     let cam = Camera::new();
