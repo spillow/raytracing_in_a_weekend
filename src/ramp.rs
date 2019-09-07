@@ -41,7 +41,7 @@ fn get_color(
 pub fn raytrace() -> Image {
     let nx = 1200;
     let ny = 800;
-    let ns = 10; // num samples / pixel
+    let ns = 30; // num samples / pixel
 
     let mut mat_idx = 0;
 
