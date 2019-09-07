@@ -39,9 +39,9 @@ fn get_color(
 
 // chap8
 pub fn raytrace() -> Image {
-    let nx = 400;
-    let ny = 300;
-    let ns = 50; // num samples / pixel
+    let nx = 1200;
+    let ny = 800;
+    let ns = 10; // num samples / pixel
 
     let mut mat_idx = 0;
 
@@ -71,8 +71,10 @@ pub fn raytrace() -> Image {
         Box::new(sphere2),
         Box::new(sphere3)];
 
-    for a in -11..11 {
-        for b in -11..11 {
+    let num_spheres = 11;
+
+    for a in -num_spheres..num_spheres {
+        for b in -num_spheres..num_spheres {
             let choose_mat = rand_unit();
             let center = Point::new(a as f32+0.9*rand_unit(),0.2,b as f32+0.9*rand_unit());
 
@@ -112,13 +114,13 @@ pub fn raytrace() -> Image {
 
     let mut rows = Vec::new();
 
-    let lookfrom   = Point::new(0.,1.,2.);
-    let lookat     = Point::new(0.,0.,-1.);
+    let lookfrom   = Point::new(13.,2.,3.);
+    let lookat     = Point::new(0.,0.,0.);
     let vup        = Vec3::new(0.,1.,0.);
-    let vfov       = 70.;
+    let vfov       = 20.;
     let aspect     = nx as f32 / ny as f32;
-    let aperature  = 2.;
-    let focus_dist = (lookfrom - lookat).length();
+    let aperature  = 0.1;
+    let focus_dist = 10.;
 
     let cam = Camera::new(
         lookfrom,
