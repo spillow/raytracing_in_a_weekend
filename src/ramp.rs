@@ -6,14 +6,9 @@ use crate::ray::module::*;
 use crate::hittable::module::*;
 use crate::camera::module::*;
 use crate::material::module::*;
+use crate::rand::module::*;
 
 use std::f32;
-
-use rand::Rng;
-
-fn rand_unit() -> f32 {
-    rand::thread_rng().gen_range(0.0f32, 1.0f32)
-}
 
 fn get_color(
     r: &Ray, world: &dyn Hittable, materials: &Vec<&dyn Material>, depth: u32) -> Color {
@@ -69,12 +64,23 @@ pub fn raytrace() -> Image {
     let spheres:Vec<&dyn Hittable> = vec![&sphere1, &sphere2, &sphere3, &sphere4, &sphere5];
 
     let world = HittableList::new(spheres);
+
+    let lookfrom   = Point::new(3.,3.,2.);
+    let lookat     = Point::new(0.,0.,-1.);
+    let vup        = Vec3::new(0.,1.,0.);
+    let vfov       = 20.;
+    let aspect     = nx as f32 / ny as f32;
+    let aperature  = 2.;
+    let focus_dist = (lookfrom - lookat).length();
+
     let cam = Camera::new(
-        Point::new(-2.,2.,1.),
-        Point::new(0.,0.,-1.),
-        Vec3::new(0.,1.,0.),
-        20.,
-        nx as f32 / ny as f32);
+        lookfrom,
+        lookat,
+        vup,
+        vfov,
+        aspect,
+        aperature,
+        focus_dist);
 
     for j in (0..ny).rev() {
         let mut cols = Vec::new();
