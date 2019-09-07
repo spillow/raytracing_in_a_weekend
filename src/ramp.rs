@@ -69,7 +69,12 @@ pub fn raytrace() -> Image {
     let spheres:Vec<&dyn Hittable> = vec![&sphere1, &sphere2, &sphere3, &sphere4, &sphere5];
 
     let world = HittableList::new(spheres);
-    let cam = Camera::new();
+    let cam = Camera::new(
+        Point::new(-2.,2.,1.),
+        Point::new(0.,0.,-1.),
+        Vec3::new(0.,1.,0.),
+        20.,
+        nx as f32 / ny as f32);
 
     for j in (0..ny).rev() {
         let mut cols = Vec::new();
